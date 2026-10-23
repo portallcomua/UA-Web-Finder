@@ -1,0 +1,10 @@
+{
+  "name": "ua-web-finder",
+  "version": "1.4.0",
+  "description": "Локальна програма для пошуку сайтів і публічних контактів",
+  "main": "main.js",
+  "license": "MIT",
+  "scripts": {"start": "electron .", "dist": "electron-builder --win portable"},
+  "devDependencies": {"electron": "^35.0.0", "electron-builder": "^26.0.12"},
+  "build": {"appId": "ua.uaserver.webfinder", "productName": "UA Web Finder", "asar": true, "files": ["main.js", "preload.js", "index.html", "styles.css", "renderer.js", "search.js", "scraper.js", "database.js", "export.js", "package.json"], "win": {"target": ["portable"], "artifactName": "UA-Web-Finder-${version}-portable.${ext}"}}
+}
