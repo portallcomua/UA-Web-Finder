@@ -1,8 +1,8 @@
 <?php
 /*
-Plugin Name: UA Web Finder
+Plugin Name: UA Web Finder 2.6.0
 Description: Пошук сайтів за CMS, збір контактів із публічних сторінок, списки, кампанії та керування відписками.
-Version: 2.5.0
+Version: 2.6.0
 Requires at least: 5.8
 Requires PHP: 7.4
 Author: UAServer
@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Версія плагіна та шляхи до його файлів.
-define('CMSF_VERSION', '2.5.0');
+define('CMSF_VERSION', '2.6.0');
 define('CMSF_DIR', plugin_dir_path(__FILE__));
 define('CMSF_URL', plugin_dir_url(__FILE__));
 
@@ -150,10 +150,10 @@ add_action('plugins_loaded', function () {
  * Publishes updates only when a GitHub Release exists for this repository.
  */
 function cmsf_github_release_info($force = false) {
-    $cached = get_transient('cmsf_github_release_v2');
+    $cached = get_transient('cmsf_github_release_v3');
     if (!$force && is_array($cached)) return $cached;
 
-    $response = wp_remote_get('https://api.github.com/repos/portallcomua/cms-web-finger/releases/latest', [
+    $response = wp_remote_get('https://api.github.com/repos/portallcomua/UA-Web-Finder/releases/latest', [
         'timeout' => 8,
         'headers' => [
             'Accept' => 'application/vnd.github+json',
@@ -220,7 +220,7 @@ add_filter('plugins_api', function ($result, $action, $args) {
         'slug' => 'cms-web-finder',
         'version' => $release['version'],
         'author' => 'UAServer',
-        'homepage' => 'https://github.com/portallcomua/cms-web-finger',
+        'homepage' => 'https://github.com/portallcomua/UA-Web-Finder',
         'download_link' => $release['package'] ?? '',
         'sections' => ['description' => 'Пошук українських сайтів, визначення CMS та збір контактів.'],
     ];
