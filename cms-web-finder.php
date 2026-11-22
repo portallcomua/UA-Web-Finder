@@ -26,6 +26,8 @@ require_once CMSF_DIR . 'includes/smtp.php';
 require_once CMSF_DIR . 'includes/mailer.php';
 require_once CMSF_DIR . 'includes/ajax.php';
 require_once CMSF_DIR . 'includes/admin.php';
+require_once CMSF_DIR . 'includes/pro.php';
+require_once CMSF_DIR . 'includes/i18n.php';
 
 // Підключаємо модуль збору контактів.
 require_once CMSF_DIR . 'includes/contacts.php';
@@ -131,6 +133,9 @@ register_activation_hook(__FILE__, function () {
 
 add_action('plugins_loaded', function () {
 
+    // Start the 30-day evaluation on first load after installing/updating to this build.
+    cmsf_trial_started_at();
+
     // Оновлюємо основну базу, якщо змінилася версія плагіна.
     if (get_option('cmsf_db_version') !== CMSF_VERSION) {
 
@@ -185,7 +190,7 @@ function cmsf_github_release_info($force = false) {
         'tested' => '6.8',
         'requires_php' => '7.4',
     ];
-    set_transient('cmsf_github_release_v2', $data, 6 * HOUR_IN_SECONDS);
+    set_transient('cmsf_github_release_v3', $data, 6 * HOUR_IN_SECONDS);
     return $data;
 }
 
