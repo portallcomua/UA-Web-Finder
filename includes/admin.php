@@ -12,7 +12,7 @@ add_action('admin_menu', function () {
 
 add_action('admin_enqueue_scripts', function () {
     $page = $_GET['page'] ?? '';
-    if (!in_array($page, ['cms-checker', 'cmsf-import', 'cmsf-lists', 'cmsf-templates', 'cmsf-settings'], true)) return;
+    if (!in_array($page, ['cms-checker', 'cmsf-import', 'cmsf-lists', 'cmsf-templates', 'cmsf-settings', 'cmsf-pro'], true)) return;
     wp_enqueue_style('cmsf-admin', CMSF_URL . 'assets/admin.css', [], CMSF_VERSION);
     if ($page === 'cmsf-templates') wp_enqueue_editor();
     $admin_deps = $page === 'cmsf-templates' ? ['wp-editor'] : [];
@@ -30,6 +30,8 @@ add_action('admin_enqueue_scripts', function () {
         'engines' => cmsf_engines(),
         'openList' => (int)($_GET['list'] ?? 0),
         'templatesUrl' => admin_url('admin.php?page=cmsf-templates'),
+        'locale' => cmsf_is_english_locale() ? 'en' : 'uk',
+        'translations' => cmsf_is_english_locale() ? cmsf_i18n_dictionary() : [],
     ]);
 });
 
