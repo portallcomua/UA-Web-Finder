@@ -1202,7 +1202,9 @@ add_action('admin_enqueue_scripts', function ($hook) {
         'ajax' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('cmsfc'),
         'exportUrl' => admin_url('admin-post.php'),
-        'exportNonce' => wp_create_nonce('cmsfc_export')
+        'exportNonce' => wp_create_nonce('cmsfc_export'),
+        'locale' => cmsf_is_english_locale() ? 'en' : 'uk',
+        'translations' => cmsf_is_english_locale() ? cmsf_i18n_dictionary() : []
     ]);
 });
 
