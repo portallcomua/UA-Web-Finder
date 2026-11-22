@@ -134,6 +134,7 @@ function cmsf_pro_render_page() {
           <p>Посилання на оплату ще не додано. Вставте hosted checkout URL нижче.</p>
         <?php endif; ?>
         <p class="description">Ціна та валюта відображаються на сторінці захищеної оплати Freemius — плагін не підміняє ціну локальним значенням.</p>
+        <div class="notice notice-warning inline"><p><strong>Для продажу клієнтам на різних сайтах:</strong> Freemius Hosted Checkout використовує success redirect URL, налаштований у Dashboard для продукту. Одного статичного redirect URL недостатньо для автоматичної активації на довільних доменах покупців. Для публічного продажу без SDK потрібен окремий централізований webhook/API-сервіс активації.</p></div>
       </div>
       <div class="cmsf-card">
         <h2>Підключення Freemius (без SDK)</h2>
