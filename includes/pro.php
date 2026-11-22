@@ -41,12 +41,16 @@ function cmsf_freemius_capture_purchase() {
     if (!$o['secret_key']) return;
 
     $signature = sanitize_text_field(wp_unslash($_GET['signature']));
-    $uri = isset($_SERVER['REQUEST_URI']) ? wp_unslash($_SERVER['REQUEST_URI']) : '';
-    $clean_uri = preg_replace('/([?&])signature=[^&]*&?/', '$1', $uri);
-    $clean_uri = preg_replace('/[?&]$/', '', $clean_uri);
-    $clean_uri = str_replace('?&', '?', $clean_uri);
-    $absolute_url = home_url($clean_uri);
-    $expected = hash_hmac('sha256', $absolute_url, $o['secret_key']);
+    // Match Freemius' documented algorithm: HMAC the exact absolute request URL
+    // after removing the trailing &signature=... parameter (do not normalize its host/path).
+    $scheme = is_ssl() ? 'https' : 'http';
+    $host = isset($_SERVER['HTTP_HOST']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_HOST'])) : (string) wp_parse_url(home_url('/'), PHP_URL_HOST);
+    $request_uri = isset($_SERVER['REQUEST_URI']) ? wp_unslash($_SERVER['REQUEST_URI']) : '';
+    $absolute_url = $scheme . '://' . $host . $request_uri;
+    $signature_pos = strpos($absolute_url, '&signature=');
+    if ($signature_pos === false) return;
+    $clean_url = substr($absolute_url, 0, $signature_pos);
+    $expected = hash_hmac('sha256', $clean_url, $o['secret_key']);
 
     $action = isset($_GET['action']) ? sanitize_key(wp_unslash($_GET['action'])) : '';
     $plan_id = isset($_GET['plan_id']) ? sanitize_text_field(wp_unslash($_GET['plan_id'])) : '';
@@ -55,8 +59,8 @@ function cmsf_freemius_capture_purchase() {
         add_settings_error('cmsf_pro', 'cmsf_invalid_purchase', 'Freemius повернув непідтверджені дані. Pro не активовано.', 'error');
         return;
     }
-    if ($o['plan_id'] !== '' && $plan_id !== $o['plan_id']) {
-        add_settings_error('cmsf_pro', 'cmsf_wrong_plan', 'Оплата підтверджена, але це не налаштований Pro-план. Pro не активовано.', 'error');
+    if ($o['plan_id'] === '' || $plan_id !== $o['plan_id']) {
+        add_settings_error('cmsf_pro', 'cmsf_wrong_plan', 'Оплату повернуто не для налаштованого Lifetime Pro-плану. Pro не активовано.', 'error');
         return;
     }
     update_option('cmsf_pro_activated', 1, false);
