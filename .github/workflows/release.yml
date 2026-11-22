@@ -1,0 +1,37 @@
+name: Build and publish UA Web Finder release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build WordPress plugin ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p package/cms-web-finder
+          while IFS= read -r -d '' file; do
+            mkdir -p "package/cms-web-finder/$(dirname "$file")"
+            cp "$file" "package/cms-web-finder/$file"
+          done < <(git ls-files -z)
+          cd package
+          zip -qr ../ua-web-finder.zip cms-web-finder
+          cd ..
+          unzip -t ua-web-finder.zip
+          test "$(unzip -Z1 ua-web-finder.zip | head -n 1 | cut -d/ -f1)" = "cms-web-finder"
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ua-web-finder.zip
+          generate_release_notes: true
+          fail_on_unmatched_files: true
