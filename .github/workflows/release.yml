@@ -2,6 +2,8 @@ name: Build and publish UA Web Finder release
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
   workflow_dispatch:
@@ -29,7 +31,15 @@ jobs:
           cd ..
           unzip -t ua-web-finder.zip
           test "$(unzip -Z1 ua-web-finder.zip | head -n 1 | cut -d/ -f1)" = "cms-web-finder"
+      - name: Upload installable ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ua-web-finder-2.6.0
+          path: ua-web-finder.zip
+          if-no-files-found: error
+          retention-days: 30
       - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: ua-web-finder.zip
