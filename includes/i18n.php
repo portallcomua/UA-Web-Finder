@@ -63,9 +63,9 @@ function cmsf_i18n_dictionary() {
       'Вибрати всі на сторінці'=>'Select all on this page','Вибрати всі'=>'Select all','Зняти вибір'=>'Clear selection',
       'Експорт CSV'=>'Export CSV','Видалити вибрані'=>'Delete selected','Повторити недоступні'=>'Retry unavailable',
       'Шаблон листа'=>'Email template','Надіслати вибраним'=>'Send to selected','Зупинити перевірку'=>'Stop checking','Обрати шаблон'=>'Select a template','Статус списку'=>'List status',
-      'Сайт'=>'Website','Версія'=>'Version','Мова'=>'Language','Телефон'=>'Phone','Нотатка'=>'Note','Відправлено'=>'Sent',
+      'Сайт ↕'=>'Website ↕','Версія'=>'Version','Мова'=>'Language','Телефон'=>'Phone','Нотатка'=>'Note','Відправлено'=>'Sent',
       'Знайдено:'=>'Found:','У черзі:'=>'Queued:','Відхилено:'=>'Rejected:','Недоступні:'=>'Unavailable:','Надіслано:'=>'Sent:',
-      'Помилки відправки:'=>'Email errors:','Вибрано:'=>'Selected:','Сторінка '=>'Page ','з'=>'of','всього'=>'total',
+      'Помилки відправки:'=>'Email errors:','Вибрано:'=>'Selected:','Сторінка '=>'Page ','всього'=>'total',
       'Немає email'=>'No email','Застаріла'=>'Outdated','Збережено'=>'Saved','Завантаження списку доменів'=>'Downloading domain list','Стан списку зон'=>'Domain-zone list status','Видалити цей сайт зі списку?'=>'Delete this website from the list?',
       'Спершу оберіть шаблон зі списку.'=>'Select a template from the list first.',
       'Видалити шаблон?'=>'Delete this template?','Шаблонів ще немає.'=>'No templates yet.',
@@ -91,10 +91,28 @@ function cmsf_i18n_dictionary() {
 function cmsf_translate_admin_html($html) {
     if (!cmsf_is_english_locale() || !is_string($html) || $html === '') return $html;
     // Keep executable JavaScript and CSS intact; translate rendered admin HTML only.
-    $chunks = preg_split('~(<script\b[^>]*>.*?</script>|<style\b[^>]*>.*?</style>)~is', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
+    $chunks = preg_split('~(<script\\b[^>]*>.*?</script>|<style\\b[^>]*>.*?</style>)~is', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
     $dict = cmsf_i18n_dictionary();
+    $safe = array_filter($dict, function ($key) { return function_exists('mb_strlen') ? mb_strlen($key, 'UTF-8') >= 8 : strlen($key) >= 16; }, ARRAY_FILTER_USE_KEY);
     foreach ($chunks as $i => $chunk) {
-        if ($i % 2 === 0) $chunks[$i] = strtr($chunk, $dict);
+        if ($i % 2 !== 0) continue;
+        $chunk = preg_replace_callback('~>([^<>]+)<~u', function ($m) use ($dict, $safe) {
+            $raw = $m[1];
+            $decoded = html_entity_decode($raw, ENT_QUOTES, 'UTF-8');
+            $trimmed = trim($decoded);
+            if (isset($dict[$trimmed])) {
+                $leading = substr($decoded, 0, strlen($decoded) - strlen(ltrim($decoded)));
+                $trailing = substr($decoded, strlen(rtrim($decoded)));
+                return '>' . esc_html($leading . $dict[$trimmed] . $trailing) . '<';
+            }
+            return '>' . strtr($raw, $safe) . '<';
+        }, $chunk);
+        $chunk = preg_replace_callback('/\\b(placeholder|title|aria-label)=(["\\\'])(.*?)\\2/i', function ($m) use ($dict, $safe) {
+            $value = html_entity_decode($m[3], ENT_QUOTES, 'UTF-8');
+            $translated = isset($dict[$value]) ? $dict[$value] : strtr($value, $safe);
+            return $m[1] . '=' . $m[2] . esc_attr($translated) . $m[2];
+        }, $chunk);
+        $chunks[$i] = $chunk;
     }
     return implode('', $chunks);
 }
