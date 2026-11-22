@@ -1,6 +1,39 @@
 (function () {
   'use strict';
   const C = window.CMSF || {};
+  // Translate both static markup and UI fragments inserted later by the admin app.
+  if (C.locale === 'en' && C.translations) {
+    const translateNode = node => {
+      if (!node) return;
+      if (node.nodeType === 3) {
+        const p = node.parentElement;
+        if (p && !/^(SCRIPT|STYLE|TEXTAREA|CODE|PRE)$/i.test(p.tagName)) {
+          const value = node.nodeValue;
+          node.nodeValue = Object.keys(C.translations).sort((a,b) => b.length-a.length)
+            .reduce((out, key) => out.split(key).join(C.translations[key]), value);
+        }
+      } else if (node.nodeType === 1 && !/^(SCRIPT|STYLE|TEXTAREA|CODE|PRE)$/i.test(node.tagName)) {
+        ['placeholder','title','aria-label'].forEach(attr => {
+          if (node.hasAttribute(attr)) {
+            let value = node.getAttribute(attr);
+            Object.keys(C.translations).sort((a,b) => b.length-a.length).forEach(key => { value = value.split(key).join(C.translations[key]); });
+            node.setAttribute(attr, value);
+          }
+        });
+        Array.from(node.childNodes).forEach(translateNode);
+      }
+    };
+    const startTranslation = () => {
+      translateNode(document.body);
+      const observer = new MutationObserver(records => records.forEach(record => {
+        if (record.type === 'characterData') translateNode(record.target);
+        record.addedNodes && record.addedNodes.forEach(translateNode);
+      }));
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    };
+    if (document.body) startTranslation();
+    else document.addEventListener('DOMContentLoaded', startTranslation, { once: true });
+  }
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
