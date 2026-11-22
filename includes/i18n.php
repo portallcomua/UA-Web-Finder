@@ -47,7 +47,7 @@ function cmsf_i18n_dictionary() {
       'Визначається автоматично (WordPress API та GitHub). Якщо автоматика помиляється або недоступна — впишіть версію вручну, вона матиме пріоритет.'=>'Detected automatically (WordPress API and GitHub). If automatic detection is incorrect or unavailable, enter a version manually; it will take priority.',
       'Перевірте, що пошта сервера взагалі відправляє листи.'=>'Check whether the server can send email.',
       'Reply-To (необов\'язково)'=>'Reply-To (optional)','; (для українського Excel)'=>'; (for Ukrainian Excel)',', (кома)'=>', (comma)',
-      'Зберегти налаштування Freemius'=>'Save Freemius settings','Пробний період'=>'Trial period',
+      'Зберегти налаштування Freemius'=>'Save Freemius settings','Пробний період'=>'Trial period','Пробний період:'=>'Trial period:','залишилося '=>' remaining ',' днів із 30.'=>' days out of 30.','Переглянути Pro та активувати'=>'View Pro and activate','Пробний період завершився.'=>'The trial period has ended.','Активуйте UA Web Finder Pro'=>'Activate UA Web Finder Pro','щоб продовжити роботу.'=>'to continue using the plugin.','Pro активовано.'=>'Pro is active.',
       'Пробний період завершився'=>'Trial period ended','Pro активовано'=>'Pro is active',
       'Після завершення пробного періоду запуск нових пошуків, перевірок і розсилок буде призупинено. Збережені дані залишаться в базі WordPress.'=>'After the trial ends, new searches, checks and email campaigns will be paused. Your saved data will remain in the WordPress database.',
       'Щоб продовжити пошук, перевірку сайтів і розсилки, активуйте UA Web Finder Pro.'=>'Activate UA Web Finder Pro to continue searching, checking websites and sending emails.',
