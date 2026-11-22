@@ -82,7 +82,7 @@ add_action('admin_post_cmsf_save_pro', function () {
 });
 
 add_action('admin_notices', function () {
-    if (!is_admin() || empty($_GET['page']) || !in_array(sanitize_key(wp_unslash($_GET['page'])), ['cms-checker','cmsf-import','cmsf-lists','cmsf-templates','cmsf-settings','cmsf-pro'], true)) return;
+    if (!is_admin() || empty($_GET['page']) || !in_array(sanitize_key(wp_unslash($_GET['page'])), ['cms-checker','cmsf-import','cmsf-lists','cmsf-templates','cmsf-settings','cmsf-pro','cmsf-contacts'], true)) return;
     if (cmsf_pro_is_active()) {
         echo '<div class="notice notice-success"><p><strong>UA Web Finder Pro</strong> — Pro активовано.</p></div>';
     } elseif (cmsf_trial_is_active()) {
