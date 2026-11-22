@@ -75,12 +75,24 @@ add_action('admin_post_cmsf_save_pro', function () {
         wp_safe_redirect(add_query_arg(['page'=>'cmsf-pro','cmsf_saved'=>'0'], admin_url('admin.php'))); exit;
     }
     update_option('cmsf_freemius_checkout_url', $url, false);
-    $new_secret = sanitize_text_field(wp_unslash($_POST['secret_key'] ?? ''));\n    if ($new_secret !== '') update_option('cmsf_freemius_secret_key', $new_secret, false);
+    $new_secret = sanitize_text_field(wp_unslash($_POST['secret_key'] ?? ''));
+    if ($new_secret !== '') update_option('cmsf_freemius_secret_key', $new_secret, false);
     update_option('cmsf_freemius_plan_id', sanitize_text_field(wp_unslash($_POST['plan_id'] ?? '')), false);
     wp_safe_redirect(add_query_arg(['page'=>'cmsf-pro','cmsf_saved'=>'1'], admin_url('admin.php'))); exit;
 });
 
-add_action('admin_notices', function () {\n    if (!is_admin() || empty($_GET['page']) || !in_array(sanitize_key(wp_unslash($_GET['page'])), ['cms-checker','cmsf-import','cmsf-lists','cmsf-templates','cmsf-settings','cmsf-pro'], true)) return;\n    if (cmsf_pro_is_active()) {\n        echo '<div class="notice notice-success"><p><strong>UA Web Finder Pro</strong> — Pro активовано.</p></div>';\n    } elseif (cmsf_trial_is_active()) {\n        echo '<div class="notice notice-info"><p><strong>Пробний період:</strong> залишилося ' . esc_html(cmsf_trial_days_left()) . ' днів із 30. <a href="' . esc_url(admin_url('admin.php?page=cmsf-pro')) . '">Переглянути Pro та активувати</a></p></div>';\n    } else {\n        echo '<div class="notice notice-warning"><p><strong>Пробний період завершився.</strong> <a href="' . esc_url(admin_url('admin.php?page=cmsf-pro')) . '">Активуйте UA Web Finder Pro</a>, щоб продовжити роботу.</p></div>';\n    }\n});\n\nadd_action('admin_menu', function () {
+add_action('admin_notices', function () {
+    if (!is_admin() || empty($_GET['page']) || !in_array(sanitize_key(wp_unslash($_GET['page'])), ['cms-checker','cmsf-import','cmsf-lists','cmsf-templates','cmsf-settings','cmsf-pro'], true)) return;
+    if (cmsf_pro_is_active()) {
+        echo '<div class="notice notice-success"><p><strong>UA Web Finder Pro</strong> — Pro активовано.</p></div>';
+    } elseif (cmsf_trial_is_active()) {
+        echo '<div class="notice notice-info"><p><strong>Пробний період:</strong> залишилося ' . esc_html(cmsf_trial_days_left()) . ' днів із 30. <a href="' . esc_url(admin_url('admin.php?page=cmsf-pro')) . '">Переглянути Pro та активувати</a></p></div>';
+    } else {
+        echo '<div class="notice notice-warning"><p><strong>Пробний період завершився.</strong> <a href="' . esc_url(admin_url('admin.php?page=cmsf-pro')) . '">Активуйте UA Web Finder Pro</a>, щоб продовжити роботу.</p></div>';
+    }
+});
+
+add_action('admin_menu', function () {
     add_submenu_page('cms-checker', 'UA Web Finder Pro', 'Pro / Активація', 'manage_options', 'cmsf-pro', 'cmsf_pro_render_page');
 }, 20);
 
