@@ -25,6 +25,41 @@
             return;
         }
 
+        // Translate the contact module, including text inserted by AJAX updates.
+        if (CMSFC.locale === 'en' && CMSFC.translations) {
+            const translations = CMSFC.translations;
+            const keys = Object.keys(translations).sort(function (a, b) { return b.length - a.length; });
+            function translate(value) {
+                const trimmed = value.trim();
+                if (Object.prototype.hasOwnProperty.call(translations, trimmed)) {
+                    return value.slice(0, value.indexOf(trimmed)) + translations[trimmed] + value.slice(value.indexOf(trimmed) + trimmed.length);
+                }
+                return keys.filter(function (key) { return key.length >= 8; }).reduce(function (out, key) {
+                    return out.split(key).join(translations[key]);
+                }, value);
+            }
+            function translateTree(node) {
+                if (!node) return;
+                if (node.nodeType === 3) {
+                    const parent = node.parentElement;
+                    if (parent && !/^(SCRIPT|STYLE|TEXTAREA|CODE|PRE)$/i.test(parent.tagName)) node.nodeValue = translate(node.nodeValue);
+                } else if (node.nodeType === 1 && !/^(SCRIPT|STYLE|TEXTAREA|CODE|PRE)$/i.test(node.tagName)) {
+                    ['placeholder', 'title', 'aria-label'].forEach(function (attr) {
+                        if (node.hasAttribute(attr)) node.setAttribute(attr, translate(node.getAttribute(attr)));
+                    });
+                    Array.from(node.childNodes).forEach(translateTree);
+                }
+            }
+            translateTree(app);
+            const translator = new MutationObserver(function (records) {
+                records.forEach(function (record) {
+                    if (record.type === 'characterData') translateTree(record.target);
+                    Array.from(record.addedNodes || []).forEach(translateTree);
+                });
+            });
+            translator.observe(app, { childList: true, subtree: true, characterData: true });
+        }
+
         let currentListId = 0;
         let currentPage = 1;
         let totalPages = 1;
