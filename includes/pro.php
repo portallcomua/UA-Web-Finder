@@ -154,6 +154,6 @@ function cmsf_pro_render_page() {
 /** Restrict resource-consuming actions after the 30-day trial, while keeping saved data readable. */
 function cmsf_trial_blocks_action($action) {
     if (cmsf_feature_access_allowed()) return false;
-    $blocked = ['list_create','add_domains','zone_step','zone_take','search','inspect','next_queued','send','requeue','row_failed'];
+    $blocked = ['list_create','add_domains','zone_step','zone_take','search','inspect','next_queued','send','requeue','row_failed','cmsfc_start','cmsfc_step','cmsfc_campaign_start','cmsfc_campaign_step'];
     return in_array($action, $blocked, true);
 }
