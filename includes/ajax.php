@@ -2,7 +2,7 @@
 if (!defined('ABSPATH')) exit;
 
 function cmsf_ajax($action, $fn) {
-    add_action('wp_ajax_cmsf_' . $action, function () use ($fn) {
+    add_action('wp_ajax_cmsf_' . $action, function () use ($fn, $action) {
         check_ajax_referer('cmsf', 'nonce');
         if (!current_user_can('manage_options')) wp_send_json_error('Немає прав');
         if (function_exists('cmsf_trial_blocks_action') && cmsf_trial_blocks_action($action)) {
