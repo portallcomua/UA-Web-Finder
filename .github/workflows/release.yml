@@ -23,7 +23,7 @@ jobs:
           while IFS= read -r -d '' file; do
             mkdir -p "package/cms-web-finder/$(dirname "$file")"
             cp "$file" "package/cms-web-finder/$file"
-          done < <(git ls-files -z)
+          done < <(git ls-files -z | grep -zE '^(cms-web-finder\.php|assets/|includes/)')
           cd package
           zip -qr ../ua-web-finder.zip cms-web-finder
           cd ..
