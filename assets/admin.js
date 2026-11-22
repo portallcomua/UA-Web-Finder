@@ -3,22 +3,22 @@
   const C = window.CMSF || {};
   // Translate both static markup and UI fragments inserted later by the admin app.
   if (C.locale === 'en' && C.translations) {
+    const keys = Object.keys(C.translations).sort((a,b) => b.length-a.length);
+    const translateText = value => {
+      const trimmed = value.trim();
+      if (Object.prototype.hasOwnProperty.call(C.translations, trimmed)) {
+        return value.slice(0, value.indexOf(trimmed)) + C.translations[trimmed] + value.slice(value.indexOf(trimmed) + trimmed.length);
+      }
+      return keys.filter(key => key.length >= 8).reduce((out, key) => out.split(key).join(C.translations[key]), value);
+    };
     const translateNode = node => {
       if (!node) return;
       if (node.nodeType === 3) {
         const p = node.parentElement;
-        if (p && !/^(SCRIPT|STYLE|TEXTAREA|CODE|PRE)$/i.test(p.tagName)) {
-          const value = node.nodeValue;
-          node.nodeValue = Object.keys(C.translations).sort((a,b) => b.length-a.length)
-            .reduce((out, key) => out.split(key).join(C.translations[key]), value);
-        }
+        if (p && !/^(SCRIPT|STYLE|TEXTAREA|CODE|PRE)$/i.test(p.tagName)) node.nodeValue = translateText(node.nodeValue);
       } else if (node.nodeType === 1 && !/^(SCRIPT|STYLE|TEXTAREA|CODE|PRE)$/i.test(node.tagName)) {
         ['placeholder','title','aria-label'].forEach(attr => {
-          if (node.hasAttribute(attr)) {
-            let value = node.getAttribute(attr);
-            Object.keys(C.translations).sort((a,b) => b.length-a.length).forEach(key => { value = value.split(key).join(C.translations[key]); });
-            node.setAttribute(attr, value);
-          }
+          if (node.hasAttribute(attr)) node.setAttribute(attr, translateText(node.getAttribute(attr)));
         });
         Array.from(node.childNodes).forEach(translateNode);
       }
